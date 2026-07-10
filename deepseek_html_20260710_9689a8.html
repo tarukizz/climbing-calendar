@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📅 攀岩游泳群 · 共享月历</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            padding: 24px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            padding: 30px 32px 40px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.08);
+        }
+
+        /* ===== 头部 ===== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a2a3a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 span {
+            font-size: 16px;
+            font-weight: 400;
+            color: #6a8aaa;
+        }
+
+        .month-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .month-nav button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: #eef2f7;
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600;
+            color: #2a4a6a;
+        }
+
+        .month-nav button:hover {
+            background: #dce4ee;
+        }
+
+        .month-nav .month-label {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a2a3a;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        /* ===== 用户管理 ===== */
+        .users-section {
+            background: #f7f9fc;
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 22px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 14px 24px;
+        }
+
+        .users-section .label {
+            font-weight: 600;
+            color: #3a5a7a;
+            font-size: 14px;
+        }
+
+        .user-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px 6px 10px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            border: 2px solid transparent;
+        }
+
+        .user-tag .color-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .user-tag .remove-user {
+            background: none;
+            border: none;
+            color: #9aaec0;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0 2px;
+            transition: 0.2s;
+        }
+
+        .user-tag .remove-user:hover {
+            color: #d45a6a;
+        }
+
+        .add-user-form {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .add-user-form input {
+            padding: 6px 14px;
+            border: 2px solid #dce4ee;
+            border-radius: 30px;
+            font-size: 14px;
+            width: 110px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .add-user-form input:focus {
+            border-color: #6a8aaa;
+        }
+
+        .add-user-form input[type="color"] {
+            width: 36px;
+            height: 36px;
+            border: 2px solid #dce4ee;
+            border-radius: 50%;
+            padding: 2px;
+            cursor: pointer;
+        }
+
+        .add-user-form button {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 30px;
+            background: #2a4a7a;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .add-user-form button:hover {
+            background: #1a3a6a;
+        }
+
+        /* ===== 图例 ===== */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 24px;
+            padding: 10px 0 16px;
+            border-bottom: 1px solid #e8eef5;
+            margin-bottom: 18px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #4a6a8a;
+        }
+
+        .legend-item .icon {
+            font-size: 18px;
+        }
+
+        /* ===== 月历网格 ===== */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+
+        .weekday-label {
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            color: #6a8aaa;
+            padding: 8px 0 4px;
+            letter-spacing: 1px;
+        }
+
+        .day-cell {
+            background: #fafcff;
+            border-radius: 14px;
+            border: 1.5px solid #e8eef5;
+            min-height: 100px;
+            padding: 6px 8px 8px;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .day-cell.other-month {
+            background: #f8fafc;
+            border-color: #eef2f7;
+        }
+
+        .day-cell .day-number {
+            font-weight: 600;
+            font-size: 15px;
+            color: #1a2a3a;
+            margin-bottom: 4px;
+        }
+
+        .day-cell.other-month .day-number {
+            color: #b0c4d8;
+        }
+
+        .day-cell .day-content {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .day-cell .event-item {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 500;
+            line-height: 1.5;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .day-cell .event-item .emoji {
+            font-size: 13px;
+        }
+
+        .day-cell .event-item.busy {
+            opacity: 0.75;
+        }
+
+        /* ===== 点击弹出操作菜单 ===== */
+        .day-cell .day-number {
+            cursor: pointer;
+            display: inline-block;
+            padding: 0 4px;
+        }
+
+        .day-cell .day-number:hover {
+            background: #e8eef5;
+            border-radius: 6px;
+        }
+
+        /* ===== 弹出菜单（浮动在日历格子上方） ===== */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.2);
+            z-index: 999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-overlay.active {
+            display: flex;
+        }
+
+        .popup {
+            background: white;
+            border-radius: 24px;
+            padding: 28px 32px 32px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            animation: popIn 0.25s ease;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .popup h3 {
+            font-size: 20px;
+            color: #1a2a3a;
+            margin-bottom: 6px;
+        }
+
+        .popup .popup-date {
+            color: #6a8aaa;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .popup .popup-users {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .popup .popup-users .user-badge {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            color: white;
+        }
+
+        .popup .action-label {
+            font-weight: 600;
+            color: #3a5a7a;
+            font-size: 14px;
+            margin: 12px 0 8px;
+        }
+
+        .popup .action-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .popup .action-btns button {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #eef2f7;
+            color: #2a4a6a;
+        }
+
+        .popup .action-btns button:hover {
+            transform: scale(1.04);
+        }
+
+        .popup .action-btns button .emoji {
+            margin-right: 4px;
+        }
+
+        .popup .action-btns button.clear-btn {
+            background: #fde8ea;
+            color: #b04a5a;
+        }
+
+        .popup .action-btns button.clear-btn:hover {
+            background: #fcd0d4;
+        }
+
+        .popup .close-popup {
+            margin-top: 16px;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 30px;
+            background: #e8eef5;
+            color: #4a6a8a;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .popup .close-popup:hover {
+            background: #dce4ee;
+        }
+
+        /* ===== 底部 ===== */
+        .footer-tip {
+            text-align: center;
+            color: #8aaac0;
+            font-size: 13px;
+            margin-top: 20px;
+            border-top: 1px solid #e8eef5;
+            padding-top: 18px;
+        }
+
+        .footer-tip strong {
+            color: #4a6a8a;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 800px) {
+            .container {
+                padding: 16px 12px 24px;
+            }
+            .day-cell {
+                min-height: 70px;
+                padding: 4px 4px 6px;
+            }
+            .day-cell .day-number {
+                font-size: 13px;
+            }
+            .day-cell .event-item {
+                font-size: 10px;
+                padding: 1px 6px;
+                white-space: normal;
+                word-break: break-word;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+            .month-nav .month-label {
+                font-size: 17px;
+                min-width: 100px;
+            }
+            .users-section {
+                padding: 12px 14px;
+            }
+            .add-user-form input {
+                width: 80px;
+                font-size: 12px;
+            }
+            .popup {
+                padding: 20px 18px 24px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .day-cell {
+                min-height: 56px;
+                border-radius: 10px;
+                padding: 2px 2px 4px;
+            }
+            .day-cell .day-number {
+                font-size: 11px;
+            }
+            .day-cell .event-item {
+                font-size: 9px;
+                padding: 1px 4px;
+            }
+            .calendar-grid {
+                gap: 3px;
+            }
+            .weekday-label {
+                font-size: 11px;
+                padding: 4px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- ===== 头部 ===== -->
+    <div class="header">
+        <h1>
+            📅 共享月历
+            <span>🧗 攀岩 · 🏊 游泳</span>
+        </h1>
+        <div class="month-nav">
+            <button id="prevMonth">‹</button>
+            <span class="month-label" id="monthLabel">2026年 6月</span>
+            <button id="nextMonth">›</button>
+            <button id="todayBtn" style="width:auto; padding:0 16px; border-radius:30px; background:#eef2f7; font-size:13px;">今天</button>
+        </div>
+    </div>
+
+    <!-- ===== 用户管理 ===== -->
+    <div class="users-section">
+        <span class="label">👥 成员</span>
+        <div id="userTags" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+        <div class="add-user-form">
+            <input type="text" id="userNameInput" placeholder="名字" maxlength="8" />
+            <input type="color" id="userColorInput" value="#4A7AB5" />
+            <button id="addUserBtn">➕ 添加</button>
+        </div>
+    </div>
+
+    <!-- ===== 图例 ===== -->
+    <div class="legend">
+        <span class="legend-item"><span class="icon">🚫</span> 有事</span>
+        <span class="legend-item"><span class="icon">🧗</span> 攀岩</span>
+        <span class="legend-item"><span class="icon">🏊</span> 游泳</span>
+        <span class="legend-item" style="color:#8aaac0;">💡 点击日期数字添加/修改</span>
+    </div>
+
+    <!-- ===== 月历 ===== -->
+    <div class="calendar-grid" id="calendarGrid">
+        <!-- JS 生成 -->
+    </div>
+
+    <!-- ===== 底部 ===== -->
+    <div class="footer-tip">
+        💾 数据自动保存在浏览器中 · 分享链接给群友即可共同使用
+    </div>
+</div>
+
+<!-- ===== 弹出菜单 ===== -->
+<div class="popup-overlay" id="popupOverlay">
+    <div class="popup">
+        <h3 id="popupDate">6月15日</h3>
+        <div class="popup-date" id="popupWeekday">星期一</div>
+        <div id="popupExisting" style="margin-bottom:12px;"></div>
+        <div class="action-label">✏️ 添加标注</div>
+        <div class="action-btns" id="popupActions">
+            <!-- JS 生成 -->
+        </div>
+        <button class="close-popup" id="closePopup">关闭</button>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    // 1. 数据管理
+    // ================================================================
+
+    // 默认用户（示例）
+    const DEFAULT_USERS = [
+        { id: 'u1', name: '小明', color: '#4A7AB5' },
+        { id: 'u2', name: '小华', color: '#E68A5E' },
+        { id: 'u3', name: '小丽', color: '#5DAE8B' },
+    ];
+
+    // 事件类型
+    const EVENT_TYPES = {
+        BUSY: { key: 'busy', label: '有事', emoji: '🚫', cls: 'busy' },
+        CLIMB: { key: 'climb', label: '攀岩', emoji: '🧗', cls: '' },
+        SWIM: { key: 'swim', label: '游泳', emoji: '🏊', cls: '' },
+    };
+
+    // 存储键名
+    const STORAGE_KEY = 'climb_swim_calendar_data';
+
+    // 数据结构：
+    // {
+    //   users: [ { id, name, color }, ... ],
+    //   events: { '2026-06-15': { 'u1': 'busy', 'u2': 'climb' }, ... }
+    // }
+
+    let data = loadData();
+    let currentYear = new Date().getFullYear();
+    let currentMonth = new Date().getMonth();
+    let selectedDate = null; // 当前弹出窗口对应的日期
+
+    // ===== 加载/保存 =====
+    function loadData() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                // 确保有 users 和 events
+                if (parsed.users && parsed.events) {
+                    return parsed;
+                }
+            } catch (e) {}
+        }
+        return {
+            users: DEFAULT_USERS,
+            events: {},
+        };
+    }
+
+    function saveData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    // ===== 工具 =====
+    function generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    }
+
+    function formatDateKey(year, month, day) {
+        return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+
+    function getDateKey(date) {
+        return formatDateKey(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
+    function getDaysInMonth(year, month) {
+        return new Date(year, month + 1, 0).getDate();
+    }
+
+    function getFirstDayOfMonth(year, month) {
+        return new Date(year, month, 1).getDay(); // 0=Sun
+    }
+
+    function getTodayKey() {
+        const now = new Date();
+        return getDateKey(now);
+    }
+
+    // ===== 获取某天的所有事件（按用户） =====
+    function getDayEvents(dateKey) {
+        return data.events[dateKey] || {};
+    }
+
+    // ===== 设置某天某个用户的事件 =====
+    function setUserEvent(dateKey, userId, eventKey) {
+        if (!data.events[dateKey]) {
+            data.events[dateKey] = {};
+        }
+        if (eventKey === null) {
+            delete data.events[dateKey][userId];
+            // 如果该天没有事件了，删除这个日期条目
+            if (Object.keys(data.events[dateKey]).length === 0) {
+                delete data.events[dateKey];
+            }
+        } else {
+            data.events[dateKey][userId] = eventKey;
+        }
+        saveData();
+        renderCalendar();
+    }
+
+    // ===== 获取用户信息 =====
+    function getUser(id) {
+        return data.users.find(u => u.id === id);
+    }
+
+    // ================================================================
+    // 2. 渲染月历
+    // ================================================================
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        const label = document.getElementById('monthLabel');
+
+        const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+        label.textContent = `${currentYear}年 ${monthNames[currentMonth]}`;
+
+        const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+        const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
+
+        // 构建网格
+        let html = '';
+
+        // 星期标签
+        const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+        for (let wd of weekdays) {
+            html += `<div class="weekday-label">${wd}</div>`;
+        }
+
+        // 填充空白
+        for (let i = 0; i < firstDay; i++) {
+            html += `<div class="day-cell other-month"></div>`;
+        }
+
+        // 日期
+        const todayKey = getTodayKey();
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dateKey = formatDateKey(currentYear, currentMonth, d);
+            const dayEvents = getDayEvents(dateKey);
+            const isToday = dateKey === todayKey;
+            const isOtherMonth = false;
+
+            // 检查是否有任何事件
+            const eventEntries = Object.entries(dayEvents);
+
+            let eventsHtml = '';
+            for (let [userId, eventKey] of eventEntries) {
+                const user = getUser(userId);
+                if (!user) continue;
+                const evType = Object.values(EVENT_TYPES).find(e => e.key === eventKey);
+                if (!evType) continue;
+                const emoji = evType.emoji;
+                const labelText = evType.label;
+                const cls = evType.cls;
+                eventsHtml += `
+                    <div class="event-item ${cls}" style="background:${user.color};">
+                        <span class="emoji">${emoji}</span>
+                        ${user.name}${labelText !== '有事' ? ` ${labelText}` : ''}
+                    </div>
+                `;
+            }
+
+            // 如果没有事件，显示空状态
+            if (!eventsHtml) {
+                eventsHtml = `<div style="font-size:11px; color:#c0d0e0; padding:2px 0;">—</div>`;
+            }
+
+            const todayClass = isToday ? ' style="border-color:#2a4a7a; background:#f0f6ff;"' : '';
+            const dayClass = isOtherMonth ? 'other-month' : '';
+
+            html += `
+                <div class="day-cell ${dayClass}"${todayClass}>
+                    <div class="day-number" data-date="${dateKey}">${d}</div>
+                    <div class="day-content">${eventsHtml}</div>
+                </div>
+            `;
+        }
+
+        grid.innerHTML = html;
+
+        // 绑定点击事件（点击日期数字打开弹出菜单）
+        document.querySelectorAll('.day-number').forEach(el => {
+            el.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const dateKey = this.dataset.date;
+                openPopup(dateKey);
+            });
+        });
+
+        // 更新用户标签
+        renderUserTags();
+    }
+
+    // ================================================================
+    // 3. 用户标签渲染
+    // ================================================================
+
+    function renderUserTags() {
+        const container = document.getElementById('userTags');
+        if (data.users.length === 0) {
+            container.innerHTML = '<span style="color:#b0c4d8; font-size:14px;">还没有成员，添加一位吧</span>';
+            return;
+        }
+        let html = '';
+        for (let user of data.users) {
+            html += `
+                <span class="user-tag" style="border-color:${user.color}; background:${user.color}18;">
+                    <span class="color-dot" style="background:${user.color};"></span>
+                    ${user.name}
+                    <button class="remove-user" data-id="${user.id}" title="移除">✕</button>
+                </span>
+            `;
+        }
+        container.innerHTML = html;
+
+        // 绑定移除事件
+        document.querySelectorAll('.remove-user').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                if (confirm(`确定要移除「${getUser(id)?.name || ''}」吗？`)) {
+                    removeUser(id);
+                }
+            });
+        });
+    }
+
+    // ================================================================
+    // 4. 弹出菜单
+    // ================================================================
+
+    function openPopup(dateKey) {
+        selectedDate = dateKey;
+        const [year, month, day] = dateKey.split('-').map(Number);
+        const dateObj = new Date(year, month - 1, day);
+        const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        const weekday = weekdays[dateObj.getDay()];
+
+        document.getElementById('popupDate').textContent = `${month}月${day}日`;
+        document.getElementById('popupWeekday').textContent = weekday;
+
+        const dayEvents = getDayEvents(dateKey);
+
+        // 显示已有标注
+        const existingContainer = document.getElementById('popupExisting');
+        if (Object.keys(dayEvents).length === 0) {
+            existingContainer.innerHTML = '<span style="color:#b0c4d8; font-size:14px;">暂无标注</span>';
+        } else {
+            let html = '<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:4px;">';
+            for (let [userId, eventKey] of Object.entries(dayEvents)) {
+                const user = getUser(userId);
+                if (!user) continue;
+                const evType = Object.values(EVENT_TYPES).find(e => e.key === eventKey);
+                if (!evType) continue;
+                html += `
+                    <span style="background:${user.color}; color:white; padding:2px 12px; border-radius:30px; font-size:13px; font-weight:500;">
+                        ${evType.emoji} ${user.name} ${evType.label}
+                    </span>
+                `;
+            }
+            html += '</div>';
+            existingContainer.innerHTML = html;
+        }
+
+        // 生成操作按钮
+        const actionsContainer = document.getElementById('popupActions');
+        let actionsHtml = '';
+
+        // 每个用户都有三个选项
+        for (let user of data.users) {
+            const currentEvent = dayEvents[user.id] || null;
+            const hasEvent = currentEvent !== null;
+            const evType = hasEvent ? Object.values(EVENT_TYPES).find(e => e.key === currentEvent) : null;
+
+            // 显示当前状态
+            if (hasEvent && evType) {
+                actionsHtml += `
+                    <button style="background:${user.color}; color:white; padding:8px 14px; border-radius:30px; border:none; font-weight:600; font-size:13px; cursor:default;">
+                        ${user.name}: ${evType.emoji} ${evType.label}
+                    </button>
+                `;
+            } else {
+                actionsHtml += `
+                    <span style="padding:8px 12px; font-size:13px; color:#8aaac0;">${user.name}: —</span>
+                `;
+            }
+
+            // 操作按钮（小）
+            actionsHtml += `
+                <div style="display:flex; gap:4px; flex-wrap:wrap; width:100%; margin-bottom:6px;">
+                    <button class="set-event" data-user="${user.id}" data-event="busy" style="background:${user.color}22; color:${user.color}; border:1.5px solid ${user.color};">
+                        🚫 有事
+                    </button>
+                    <button class="set-event" data-user="${user.id}" data-event="climb" style="background:${user.color}22; color:${user.color}; border:1.5px solid ${user.color};">
+                        🧗 攀岩
+                    </button>
+                    <button class="set-event" data-user="${user.id}" data-event="swim" style="background:${user.color}22; color:${user.color}; border:1.5px solid ${user.color};">
+                        🏊 游泳
+                    </button>
+                    <button class="clear-event" data-user="${user.id}" style="background:#fde8ea; color:#b04a5a; border:1.5px solid #fcd0d4; padding:4px 12px; border-radius:30px; font-weight:600; font-size:12px; cursor:pointer;">
+                        ✕ 清除
+                    </button>
+                </div>
+            `;
+        }
+
+        actionsContainer.innerHTML = actionsHtml;
+
+        // 绑定设置事件
+        document.querySelectorAll('.set-event').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const userId = this.dataset.user;
+                const eventKey = this.dataset.event;
+                setUserEvent(selectedDate, userId, eventKey);
+                openPopup(selectedDate); // 刷新弹窗
+            });
+        });
+
+        document.querySelectorAll('.clear-event').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const userId = this.dataset.user;
+                setUserEvent(selectedDate, userId, null);
+                openPopup(selectedDate); // 刷新弹窗
+            });
+        });
+
+        document.getElementById('popupOverlay').classList.add('active');
+    }
+
+    function closePopup() {
+        document.getElementById('popupOverlay').classList.remove('active');
+        selectedDate = null;
+    }
+
+    // ================================================================
+    // 5. 用户管理
+    // ================================================================
+
+    function addUser(name, color) {
+        if (!name.trim()) {
+            alert('请输入名字');
+            return false;
+        }
+        if (data.users.some(u => u.name === name.trim())) {
+            alert(`「${name.trim()}」已存在`);
+            return false;
+        }
+        data.users.push({
+            id: generateId(),
+            name: name.trim(),
+            color: color || '#4A7AB5',
+        });
+        saveData();
+        renderCalendar();
+        return true;
+    }
+
+    function removeUser(id) {
+        data.users = data.users.filter(u => u.id !== id);
+        // 清除该用户的所有事件
+        for (let dateKey in data.events) {
+            if (data.events[dateKey][id]) {
+                delete data.events[dateKey][id];
+                if (Object.keys(data.events[dateKey]).length === 0) {
+                    delete data.events[dateKey];
+                }
+            }
+        }
+        saveData();
+        renderCalendar();
+    }
+
+    // ================================================================
+    // 6. 初始化 & 事件绑定
+    // ================================================================
+
+    function init() {
+        // 如果数据为空（首次使用），添加默认用户
+        if (data.users.length === 0) {
+            data.users = DEFAULT_USERS;
+            saveData();
+        }
+
+        renderCalendar();
+
+        // 月份导航
+        document.getElementById('prevMonth').addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        });
+
+        document.getElementById('nextMonth').addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+
+        document.getElementById('todayBtn').addEventListener('click', () => {
+            const now = new Date();
+            currentYear = now.getFullYear();
+            currentMonth = now.getMonth();
+            renderCalendar();
+        });
+
+        // 添加用户
+        document.getElementById('addUserBtn').addEventListener('click', () => {
+            const nameInput = document.getElementById('userNameInput');
+            const colorInput = document.getElementById('userColorInput');
+            const name = nameInput.value.trim();
+            const color = colorInput.value;
+            if (addUser(name, color)) {
+                nameInput.value = '';
+            }
+        });
+
+        document.getElementById('userNameInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('addUserBtn').click();
+            }
+        });
+
+        // 关闭弹窗
+        document.getElementById('closePopup').addEventListener('click', closePopup);
+        document.getElementById('popupOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closePopup();
+        });
+
+        // 键盘快捷键：ESC 关闭弹窗
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closePopup();
+        });
+
+        console.log('📅 共享月历已启动！');
+        console.log('💡 点击日期数字添加/修改标注');
+        console.log('📊 当前数据:', data);
+    }
+
+    // 启动
+    init();
+</script>
+</body>
+</html>
